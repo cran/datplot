@@ -15,14 +15,13 @@ library(ggridges)
 library(reshape2)
 
 ## -----------------------------------------------------------------------------
-inscriptions <- readxl::read_excel(system.file("extdata",
-                                               "Bithynia_Inscriptions.xlsx",
-                                               package = "datplot",
-                                               mustWork = TRUE))
+inscriptions <- read.csv(system.file("extdata",
+                                     "Bithynia_Inscriptions_ascii.csv",
+                                     package = "datplot"))
 summary(inscriptions)
 
 ## -----------------------------------------------------------------------------
-inscriptions$ID <- paste("I_", 1:nrow(inscriptions), sep = "")
+inscriptions$ID <- paste("I_", seq_len(nrow(inscriptions)), sep = "")
 
 ## -----------------------------------------------------------------------------
 unique(inscriptions$Location)
@@ -30,7 +29,7 @@ unique(inscriptions$Language)
 
 ## ----message=FALSE------------------------------------------------------------
 inscriptions <- inscriptions %>%
-  rename(Dating = `Chronological Frame`) %>%
+  rename(Dating = Chronological.Frame) %>%
   mutate(Dating = na_if(Dating, "---"),
          Language = replace(Language, Language == "Gr/Lat", "Greek/Latin"),
          Language = replace(Language, Language == "Gr / Lat", "Greek/Latin"),
@@ -84,7 +83,7 @@ num_dating$DAT_max[sel] <- paste("-", gsub(" BC", "", num_dating$Dating[sel]),
 
 ## ----echo = FALSE-------------------------------------------------------------
 require(knitr)
-knitr::kable(na.omit(na.omit(num_dating)[sample(1:nrow(na.omit(num_dating)), 
+knitr::kable(na.omit(na.omit(num_dating)[sample(seq_len(nrow(na.omit(num_dating))), 
                                                 10), ]))
 
 ## -----------------------------------------------------------------------------
@@ -96,16 +95,16 @@ num_dating$Dating <- as.character(num_dating$Dating)
 
 ## -----------------------------------------------------------------------------
 # Values like: 92-120 AD
-sel <- grep("^[0-9]{1,3}–[0-9]{1,3} AD", num_dating$Dating)
+sel <- grep("^[0-9]{1,3}-[0-9]{1,3} AD", num_dating$Dating)
 for (r in sel) {
-  split <- strsplit(x = num_dating$Dating[r], split = "–| ")
+  split <- strsplit(x = num_dating$Dating[r], split = "-| ")
   num_dating$DAT_min[r] <- split[[1]][1]
   num_dating$DAT_max[r] <- split[[1]][2]
 }
 # Values like: AD 92-120
-sel <- grep("^AD [0-9]{1,3}–[0-9]{1,3}$", num_dating$Dating)
+sel <- grep("^AD [0-9]{1,3}-[0-9]{1,3}$", num_dating$Dating)
 for (r in sel) {
-  split <- strsplit(x = num_dating$Dating[r], split = "–| ")
+  split <- strsplit(x = num_dating$Dating[r], split = "-| ")
   num_dating$DAT_min[r] <- split[[1]][2]
   num_dating$DAT_max[r] <- split[[1]][3]
 }
@@ -124,15 +123,15 @@ for (r in sel) {
   num_dating$DAT_max[r] <- split[[1]][2]
 }
 # Values like: 525-75 BC
-sel <- grep("^[0-9]{1,3}–[0-9]{1,3} BC", num_dating$Dating)
+sel <- grep("^[0-9]{1,3}-[0-9]{1,3} BC", num_dating$Dating)
 for (r in sel) {
-  split <- strsplit(x = num_dating$Dating[r], split = "–| ")
+  split <- strsplit(x = num_dating$Dating[r], split = "-| ")
   num_dating$DAT_min[r] <- 0 - as.numeric(split[[1]][1])
   num_dating$DAT_max[r] <- 0 - as.numeric(split[[1]][2])
 }
 
 ## ----echo = FALSE-------------------------------------------------------------
-knitr::kable(na.omit(na.omit(num_dating)[sample(1:nrow(na.omit(num_dating)),
+knitr::kable(na.omit(na.omit(num_dating)[sample(seq_len(nrow(na.omit(num_dating))),
                                                 10), ]))
 
 ## -----------------------------------------------------------------------------
@@ -158,7 +157,7 @@ for (r in sel) {
 
 
 ## ----echo = FALSE-------------------------------------------------------------
-knitr::kable(na.omit(na.omit(num_dating)[sample(1:nrow(na.omit(num_dating)), 
+knitr::kable(na.omit(na.omit(num_dating)[sample(seq_len(nrow(na.omit(num_dating))), 
                                                 10), ]))
 
 ## -----------------------------------------------------------------------------
@@ -280,7 +279,7 @@ ggplot(data = inscr_steps,
            y = fct_rev(as_factor(variable)),
            fill = variable,
            weight = weight)) +
-  geom_density_ridges(aes(height = ..density..),
+  geom_density_ridges(aes(height = after_stat(density)),
                       stat = "density", alpha = 0.9) +
   scale_fill_discrete(guide = FALSE)
 
@@ -292,7 +291,7 @@ ggplot(data = inscr_steps,
            y = fct_rev(as_factor(variable)),
            fill = variable,
            weight = weight)) +
-  geom_density_ridges(aes(height = ..density..), stat = "density", alpha = 0.9) +
+  geom_density_ridges(aes(height = after_stat(density)), stat = "density", alpha = 0.9) +
   scale_x_continuous(breaks = seq(from = -800, to = 800, by = 100),
                      limits = c(-800,800), name = "") +
   geom_vline(xintercept = 0, alpha = 0.5, lwd = 1) +

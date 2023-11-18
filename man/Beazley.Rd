@@ -8,16 +8,16 @@
 A data frame with 1000 rows and 4 variables
 }
 \source{
-https://www.beazley.ox.ac.uk/pottery/default.htm
+https://www.carc.ox.ac.uk/carc/pottery
 }
 \usage{
 data(Beazley)
 }
 \description{
 A test dataset containing a data.frame how it should ideally be arranged
-to work with datplot.Data are gathered from the Beazley Archive Pottery
-Database (BAPD) -- https://www.beazley.ox.ac.uk/pottery/default.htm and
-transformed to work with datplot
+to work with datplot. Data are gathered from the Beazley Archive Pottery
+Database (BAPD) -- https://www.carc.ox.ac.uk/carc/pottery and
+transformed to work with datplot.
 }
 \details{
 \itemize{

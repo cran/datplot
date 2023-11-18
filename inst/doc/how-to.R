@@ -22,7 +22,7 @@ library(datplot)
 data(Beazley)
 
 ## ----preptable, echo = FALSE--------------------------------------------------
-knitr::kable(Beazley[sample(1:nrow(Beazley), 10, replace = FALSE), ])
+knitr::kable(Beazley[sample(seq_len(nrow(Beazley)), 10, replace = FALSE), ])
 
 ## ----barplot------------------------------------------------------------------
 Beazley$DAT_mean <- (Beazley$DAT_max + Beazley$DAT_min) / 2
@@ -93,8 +93,22 @@ histogramscale <- get.histogramscale(result)
 ## ----ggplot-combination-------------------------------------------------------
 ggplot(result, aes(x = DAT_step, fill = variable)) + Plot_Theme + Plot_Fill +
   stat_density(alpha = 0.5, position = "dodge",
-               aes(y = (..density.. * histogramscale), weight = weight)) +
+               aes(y = (after_stat(density) * histogramscale), weight = weight)) +
   geom_histogram(alpha = 0.5, binwidth = attributes(result)$stepsize,
                  position = "dodge") +
   labs(y = "maximum number of objects per year", x = "Dating")
+
+## ----cumulative demo, fig.height = 10-----------------------------------------
+data("Inscr_Bithynia")
+Inscr_Bithynia <- na.omit(Inscr_Bithynia[, c(1, 3, 8, 9)])
+Inscr_Bithynia <- Inscr_Bithynia[sample(seq_len(nrow(Inscr_Bithynia)), 5), ]
+Inscr_Bithynia_steps <- datsteps(Inscr_Bithynia, 
+                                 stepsize = 1, 
+                                 calc = "probability", 
+                                 cumulative = TRUE)
+
+ggplot(Inscr_Bithynia_steps, aes(x = DAT_step, y = cumul_prob, fill = variable)) + 
+  geom_col() + facet_wrap(. ~ ID, ncol = 1) +
+  labs(y = "Cumulative Probability", x = "Dating", fill = "Origin") + 
+  theme(legend.position = "bottom")
 
